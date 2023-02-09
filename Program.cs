@@ -4,11 +4,9 @@ using System.Linq;
 
 namespace TastyBot
 {
-    public class Program
+    public partial class Program
     {
         private const string BaseUrl = "https://api.tastyworks.com";
-        private const string SecretName = "<YOUR_EMAIL>";
-        private const string SecretSauce = "<YOUR_PASSWORD>";
         private const int TimeOut = 10;
 
         public static async Task Main(string[] args)

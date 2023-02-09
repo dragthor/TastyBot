@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TastyBot.Models;
 using System.Collections.Generic;
+using TastyBot.Rules;
 
 namespace TastyBot.Library
 {
@@ -17,7 +18,7 @@ namespace TastyBot.Library
         Task<TastyMetrics> getMarketMetrics(string tickers);
         Task<TastyChain> getOptionChain(string ticker);
         Task<TastyStreamer> geStreamerTokens();
-        Task<List<TastyResult>> processRules();
+        Task<List<RuleResult>> processRules();
         void Terminate();
     }
 
@@ -177,14 +178,14 @@ namespace TastyBot.Library
             return request;
         }
 
-        public async Task<List<TastyResult>> processRules()
+        public async Task<List<RuleResult>> processRules()
         {
             // TODO: Implement the following example rules:
             //
             // Do I have sufficient buying power?
             // Is the VIX above 20?
             // Did SPX drop 2%?
-            var list = new List<TastyResult>();
+            var list = new List<RuleResult>();
 
             return list;
         }
