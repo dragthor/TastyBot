@@ -1,4 +1,4 @@
-# Tasty Automated Bot w/Unofficial API
+# Tastyworks Automated Bot w/Unofficial API
 
 Cross platform (Windows, Linux, and macOS) automated bot for TastyTrade customers.
 
