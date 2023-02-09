@@ -11,6 +11,11 @@ Plug-in your own rules.  Here is an example:
 
 Referral link - https://start.tastyworks.com/#/login?referralCode=SP8DSHF682
 
+## Safety and Security
+
+Never give your password to anyone.  This code is open source.  You can verify that the TastyBot does not save nor transmit your password.
+
 ## Disclaimer
 
 This is an unofficial, reverse-engineered API for Tastyworks. There is no implied warranty for any actions and results which arise from using it.
+
