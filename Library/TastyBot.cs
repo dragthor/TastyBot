@@ -14,6 +14,9 @@ namespace TastyBot.Library
         Task<TastySessionInfo> getAuthorization();
         Task<TastyAccountInfo> getAccounts();
         Task<TastyBalance> getBalance(string accountId);
+        Task<TastyMetrics> getMarketMetrics(string tickers);
+        Task<TastyChain> getOptionChain(string ticker);
+        Task<TastyStreamer> geStreamerTokens();
         Task<List<TastyResult>> processRules();
         void Terminate();
     }
@@ -94,6 +97,46 @@ namespace TastyBot.Library
 
             return obj.data;
         }
+
+        public async Task<TastyMetrics> getMarketMetrics(string ticker)
+        {
+            var request = getRequest("/market-metrics?symbols=" + ticker, HttpMethod.Get);
+
+            var response = await _client.SendAsync(request);
+
+            var result = await response.Content.ReadAsStringAsync();
+
+            var obj = JsonConvert.DeserializeObject<TastyMetricsInfo>(result);
+
+            return obj.data;
+        }
+
+        public async Task<TastyChain> getOptionChain(string ticker)
+        {
+            var request = getRequest("/option-chains/" + ticker  + "/nested", HttpMethod.Get);
+
+            var response = await _client.SendAsync(request);
+
+            var result = await response.Content.ReadAsStringAsync();
+
+            var obj = JsonConvert.DeserializeObject<TastyChainInfo>(result);
+
+            return obj.data;
+        }
+
+        public async Task<TastyStreamer> geStreamerTokens()
+        {
+            var request = getRequest("/quote-streamer-tokens", HttpMethod.Get);
+
+            var response = await _client.SendAsync(request);
+
+            var result = await response.Content.ReadAsStringAsync();
+
+            var obj = JsonConvert.DeserializeObject<TastyStreamerInfo>(result);
+
+            return obj.data;
+        }
+
 
         public void Terminate()
         {
