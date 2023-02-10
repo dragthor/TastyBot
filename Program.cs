@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using System.Linq;
+using TastyBot.Models;
 
 namespace TastyBot
 {
@@ -8,7 +9,7 @@ namespace TastyBot
     {
         private const string BaseUrl = "https://api.tastyworks.com";
         private const int TimeOut = 10;
-
+       
         public static async Task Main(string[] args)
         {
             var tastyBot = Library.TastyBot.CreateInstance(SecretName, SecretSauce, BaseUrl, TimeOut);
@@ -26,7 +27,8 @@ namespace TastyBot
                     Console.WriteLine("Account: " + account.account.accountnumber);
                 });
 
-                var balance = await tastyBot.getBalance(accounts.items.First().account.accountnumber);
+                var primaryAccount = accounts.items.First();
+                var balance = await tastyBot.getBalance(primaryAccount.account.accountnumber);
 
                 Console.WriteLine("Cash: " + balance.cashbalance + ", Maintenance: " + balance.maintenanceexcess + ", Reg-T Margin: " + balance.regtmarginrequirement + ", Futures Margin; " + balance.futuresmarginrequirement);
 
@@ -40,6 +42,33 @@ namespace TastyBot
                 {
                     Console.WriteLine("Nothing to do at this time.");
                 }
+
+                var shortLeg = new Leg()
+                {
+                    instrumenttype = "Equity Option",
+                    symbol = "SPX   230317P03700000",
+                    action = "Sell to Open",
+                    quantity = "1"
+                };
+
+                var longLeg = new Leg()
+                {
+                    instrumenttype = "Equity Option",
+                    symbol = "SPX   230317P03695000",
+                    action = "Buy to Open",
+                    quantity = "1"
+                };
+
+                var creditSpread = new TastySpread() {
+                    source = "WBT-ember;",
+                    ordertype = "Limit",
+                    timeinforce = "GTC",
+                    price = ".95",
+                    priceeffect = "Credit",
+                    legs = new Leg[] { shortLeg, longLeg }  
+                };
+
+                var preview = await tastyBot.doDryRun(primaryAccount.account.accountnumber, creditSpread);
             }
             catch (Exception ex)
             {
@@ -48,8 +77,6 @@ namespace TastyBot
             finally
             {
                 tastyBot.Terminate();
-
-                Console.WriteLine("Done and done.");
             }
         }
     }

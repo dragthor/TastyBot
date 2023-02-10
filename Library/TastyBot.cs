@@ -17,7 +17,9 @@ namespace TastyBot.Library
         Task<TastyBalance> getBalance(string accountId);
         Task<TastyMetrics> getMarketMetrics(string tickers);
         Task<TastyChain> getOptionChain(string ticker);
-        Task<TastyStreamer> geStreamerTokens();
+        Task<TastyStreamer> getStreamerTokens();
+        Task<string> doDryRun(string accountId, TastySpread spread);
+        Task<string> placeOrder(string accountId, TastySpread spread);
         Task<List<RuleResult>> processRules();
         void Terminate();
     }
@@ -32,6 +34,7 @@ namespace TastyBot.Library
         private readonly HttpClient _client;
 
         private string _authToken;
+        private bool _liveOrdersEnabled = false;
 
         private TastyBot(string secretName, string secretSauce, string baseUrl, int timeOut) {
             _secretName = secretName;
@@ -47,6 +50,7 @@ namespace TastyBot.Library
             _client = new HttpClient(handler);
             _client.Timeout = TimeSpan.FromSeconds(_timeOut);
         }
+
 
         public static ITastyBot CreateInstance(string secretName, string secretSauce, string baseUrl, int timeOut)
         {
@@ -88,7 +92,7 @@ namespace TastyBot.Library
 
         public async Task<TastyBalance> getBalance(string accountId)
         {
-            var request = getRequest("/accounts/" + accountId + "/balances", HttpMethod.Get);
+            var request = getRequest($"/accounts/{accountId}/balances", HttpMethod.Get);
 
             var response = await _client.SendAsync(request);
 
@@ -101,7 +105,7 @@ namespace TastyBot.Library
 
         public async Task<TastyMetrics> getMarketMetrics(string ticker)
         {
-            var request = getRequest("/market-metrics?symbols=" + ticker, HttpMethod.Get);
+            var request = getRequest($"/market-metrics?symbols={ticker}", HttpMethod.Get);
 
             var response = await _client.SendAsync(request);
 
@@ -114,7 +118,7 @@ namespace TastyBot.Library
 
         public async Task<TastyChain> getOptionChain(string ticker)
         {
-            var request = getRequest("/option-chains/" + ticker  + "/nested", HttpMethod.Get);
+            var request = getRequest($"/option-chains/{ticker}/nested", HttpMethod.Get);
 
             var response = await _client.SendAsync(request);
 
@@ -125,7 +129,7 @@ namespace TastyBot.Library
             return obj.data;
         }
 
-        public async Task<TastyStreamer> geStreamerTokens()
+        public async Task<TastyStreamer> getStreamerTokens()
         {
             var request = getRequest("/quote-streamer-tokens", HttpMethod.Get);
 
@@ -138,6 +142,34 @@ namespace TastyBot.Library
             return obj.data;
         }
 
+        public async Task<string> doDryRun(string accountId, TastySpread spread)
+        {
+            var json = JsonConvert.SerializeObject(spread);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            var request = getRequest($"/accounts/{accountId}/orders/dry-run", HttpMethod.Post, content);
+
+            var response = await _client.SendAsync(request);
+
+            var result = await response.Content.ReadAsStringAsync();
+
+            return result;
+        }
+
+        public async Task<string> placeOrder(string accountId, TastySpread spread)
+        {
+            // Fail safe.
+            if (_liveOrdersEnabled == false) throw new Exception("Live orders are NOT enabled.");
+
+            var json = JsonConvert.SerializeObject(spread);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            var request = getRequest($"/accounts/{accountId}/orders", HttpMethod.Post, content);
+
+            var response = await _client.SendAsync(request);
+
+            var result = await response.Content.ReadAsStringAsync();
+
+            return result;
+        }
 
         public void Terminate()
         {
