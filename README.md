@@ -11,6 +11,10 @@ Plug-in your own rules.  Here is an example:
 
 Referral link - https://start.tastyworks.com/#/login?referralCode=SP8DSHF682
 
+## Warning
+
+The code will actually place an order when `_liveOrdersEnabled` is true (default is false).
+
 ## Safety and Security
 
 Never give your password to anyone.  This code is open source.  You can verify that the TastyBot does not save nor transmit your password.  All communication between TastyWorks and the TastyBot are encrypted using SSL.

@@ -69,6 +69,9 @@ namespace TastyBot
                 };
 
                 var preview = await tastyBot.doDryRun(primaryAccount.account.accountnumber, creditSpread);
+
+                // Warning: Actually places an order when _liveOrdersEnabled is true (default is false).
+                // var order = await tastyBot.placeOrder(primaryAccount.account.accountnumber, creditSpread);
             }
             catch (Exception ex)
             {
