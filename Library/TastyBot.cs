@@ -32,13 +32,13 @@ namespace TastyBot.Library
         private readonly string _secretSauce;
         private readonly string _baseUrl;
         private readonly int _timeOut;
+        private readonly bool _liveOrdersEnabled = false;
 
         private readonly HttpClient _client;
 
-        private string _authToken;
-        private bool _liveOrdersEnabled = false;
+        private string _authToken;  
 
-        private TastyBot(string secretName, string secretSauce, string baseUrl, int timeOut) {
+        private TastyBot(string secretName, string secretSauce, string baseUrl, int timeOut, bool liveOrdersEnabled) {
             _secretName = secretName;
             _secretSauce= secretSauce;
             _baseUrl = baseUrl;
@@ -51,12 +51,19 @@ namespace TastyBot.Library
 
             _client = new HttpClient(handler);
             _client.Timeout = TimeSpan.FromSeconds(_timeOut);
+            _liveOrdersEnabled = liveOrdersEnabled;
         }
 
+        public static ITastyBot CreateDebugInstance(string secretName, string secretSauce, string baseUrl, int timeOut)
+        {
+            var bot = new TastyBot(secretName, secretSauce, baseUrl, timeOut, false);
+
+            return bot;
+        }
 
         public static ITastyBot CreateInstance(string secretName, string secretSauce, string baseUrl, int timeOut)
         {
-            var bot = new TastyBot(secretName, secretSauce, baseUrl, timeOut);
+            var bot = new TastyBot(secretName, secretSauce, baseUrl, timeOut, true);
 
             return bot;
         }

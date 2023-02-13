@@ -13,7 +13,7 @@ namespace TastyBot
         
         public static async Task Main(string[] args)
         {
-            var tastyBot = Library.TastyBot.CreateInstance(SecretName, SecretSauce, BaseUrl, TimeOut);
+            var tastyBot = Library.TastyBot.CreateDebugInstance(SecretName, SecretSauce, BaseUrl, TimeOut);
             var quoteMachine = Library.StockDataOrg.CreateInstance(BaseQuoteUrl, TimeOut, StockDataOrgApiToken);
 
             try
