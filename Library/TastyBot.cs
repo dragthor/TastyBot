@@ -18,8 +18,10 @@ namespace TastyBot.Library
         Task<TastyMetrics> getMarketMetrics(string tickers);
         Task<TastyChain> getOptionChain(string ticker);
         Task<TastyStreamer> getStreamerTokens();
-        Task<string> doDryRun(string accountId, TastySpread spread);
-        Task<string> placeOrder(string accountId, TastySpread spread);
+        Task<TastyOrderData> doDryRun(string accountId, TastySpread spread);
+        Task<TastyOrderData> placeOrder(string accountId, TastySpread spread);
+        Task<TastyPositionData> getPositions(string accountId);
+        Task<TastyLiveOrderData> getOrders(string accountId);
         Task<List<RuleResult>> processRules();
         void Terminate();
     }
@@ -142,7 +144,7 @@ namespace TastyBot.Library
             return obj.data;
         }
 
-        public async Task<string> doDryRun(string accountId, TastySpread spread)
+        public async Task<TastyOrderData> doDryRun(string accountId, TastySpread spread)
         {
             var json = JsonConvert.SerializeObject(spread);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
@@ -152,10 +154,12 @@ namespace TastyBot.Library
 
             var result = await response.Content.ReadAsStringAsync();
 
-            return result;
+            var obj = JsonConvert.DeserializeObject<TastyOrderInfo>(result);
+
+            return obj.data;
         }
 
-        public async Task<string> placeOrder(string accountId, TastySpread spread)
+        public async Task<TastyOrderData> placeOrder(string accountId, TastySpread spread)
         {
             // Fail safe.
             if (_liveOrdersEnabled == false) throw new Exception("Live orders are NOT enabled.");
@@ -168,7 +172,35 @@ namespace TastyBot.Library
 
             var result = await response.Content.ReadAsStringAsync();
 
-            return result;
+            var obj = JsonConvert.DeserializeObject<TastyOrderInfo>(result);
+
+            return obj.data;
+        }
+
+        public async Task<TastyPositionData> getPositions(string accountId)
+        {
+            var request = getRequest($"/accounts/{accountId}/positions", HttpMethod.Get);
+
+            var response = await _client.SendAsync(request);
+
+            var result = await response.Content.ReadAsStringAsync();
+
+            var obj = JsonConvert.DeserializeObject<TastyPositionInfo>(result);
+
+            return obj.data;
+        }
+
+        public async Task<TastyLiveOrderData> getOrders(string accountId)
+        {
+            var request = getRequest($"/accounts/{accountId}/orders/live", HttpMethod.Get);
+
+            var response = await _client.SendAsync(request);
+
+            var result = await response.Content.ReadAsStringAsync();
+
+            var obj = JsonConvert.DeserializeObject<TastyLiveOrderInfo>(result);
+
+            return obj.data;
         }
 
         public void Terminate()

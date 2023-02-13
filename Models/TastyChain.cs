@@ -54,6 +54,11 @@ namespace TastyBot.Models
         public int daystoexpiration { get; set; }
         public string settlementtype { get; set; }
         public Strike[] strikes { get; set; }
+
+        public override string ToString()
+        {
+            return daystoexpiration.ToString();
+        }
     }
 
     public class Strike
@@ -62,6 +67,10 @@ namespace TastyBot.Models
         public string strikeprice { get; set; }
         public string call { get; set; }
         public string put { get; set; }
-    }
 
+        public override string ToString()
+        {
+            return strikeprice ?? "0";
+        }
+    }
 }

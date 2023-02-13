@@ -2,12 +2,13 @@
 
 Cross platform (Windows, Linux, and macOS) automated bot for TastyTrade customers.
 
-Plug-in your own rules.  Here is an example:
+Plug-in your own rules.  Here is an example of what I want the TastyBot to do:
 
+- Do I already have a SPY position open?
 - Do I have sufficient buying power?
 - Is the VIX above 20?
-- Did SPX drop 2%?
-- All are true? Then sell a 45 DTE $25 wide SPX put spread at the 10 delta
+- Did SPY drop 2%?
+- All are true? Then sell a 45 DTE $5 wide SPY put spread at the 10 delta
 
 Referral link - https://start.tastyworks.com/#/login?referralCode=SP8DSHF682
 
