@@ -3,7 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.33122.133
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TastyBot", "TastyBot.csproj", "{5862126A-8498-42AB-BC24-159C2E3B8CD9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TastyBot", "TastyBot\TastyBot.csproj", "{5862126A-8498-42AB-BC24-159C2E3B8CD9}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TastyBot.Tests", "TastyBot.Tests\TastyBot.Tests.csproj", "{426512E1-A29C-4B71-ACC3-C5B0E3B9D57D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TastyBot.Library", "TastyBot.Library\TastyBot.Library.csproj", "{4F2E42A6-47EB-4E87-B140-862D3ADDA672}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +19,14 @@ Global
 		{5862126A-8498-42AB-BC24-159C2E3B8CD9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5862126A-8498-42AB-BC24-159C2E3B8CD9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5862126A-8498-42AB-BC24-159C2E3B8CD9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{426512E1-A29C-4B71-ACC3-C5B0E3B9D57D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{426512E1-A29C-4B71-ACC3-C5B0E3B9D57D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{426512E1-A29C-4B71-ACC3-C5B0E3B9D57D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{426512E1-A29C-4B71-ACC3-C5B0E3B9D57D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4F2E42A6-47EB-4E87-B140-862D3ADDA672}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4F2E42A6-47EB-4E87-B140-862D3ADDA672}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4F2E42A6-47EB-4E87-B140-862D3ADDA672}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4F2E42A6-47EB-4E87-B140-862D3ADDA672}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

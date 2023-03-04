@@ -1,11 +1,7 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.Net.Http;
 using System.Net;
 using System.Text;
-using System.Threading.Tasks;
 using TastyBot.Models;
-using System.Collections.Generic;
 using TastyBot.Rules;
 
 namespace TastyBot.Library
