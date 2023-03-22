@@ -22,5 +22,4 @@ Never give your password to anyone.  This code is open source.  You can verify t
 
 ## Disclaimer
 
-This is an unofficial, reverse-engineered API for TastyTrade.  Zero inside information and knowledge was used to create it.  There is no implied warranty for any actions and results which arise from using it.
-
+This is an unofficial, reverse-engineered API for TastyTrade.  Zero inside information and knowledge was used to create it.  There is no implied warranty for any actions and results which arise from using it.  Any examples, rules, or algorithms are intended for educational purposes only and not financial advice.
