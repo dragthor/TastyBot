@@ -19,7 +19,7 @@ namespace TastyBot.Library
         Task<TastyPositionData> getPositions(string accountId);
         Task<TastyLiveOrderData> getOrders(string accountId);
         Task<List<RuleResult>> processRules();
-        void Terminate();
+        Task Terminate();
     }
 
     public class TastyBot : ITastyBot
@@ -206,10 +206,17 @@ namespace TastyBot.Library
             return obj.data;
         }
 
-        public void Terminate()
+        public async Task Terminate()
         {
+            var request = getRequest("/sessions", HttpMethod.Delete);
+
+            var response = await _client.SendAsync(request);
+
+            var result = await response.Content.ReadAsStringAsync();
+
             if (_client != null)
             {
+                _client.CancelPendingRequests();
                 _client.Dispose();
             }
         }

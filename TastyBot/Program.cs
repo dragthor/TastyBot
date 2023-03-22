@@ -158,7 +158,7 @@ namespace TastyBot
             }
             finally
             {
-                tastyBot.Terminate();
+                await tastyBot.Terminate();
                 quoteMachine.Terminate();
             }
         }
