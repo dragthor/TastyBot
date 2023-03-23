@@ -18,7 +18,7 @@ The code will actually place an order when `_liveOrdersEnabled` is true (default
 
 ## Safety and Security
 
-Never give your password to anyone.  This code is open source.  You can verify that the TastyBot does not save nor transmit your password (other than the initial authentication API call `Task<TastySessionInfo> getAuthorization()`).  
+Never give your password to anyone.  This code is open source.  You can verify that the TastyBot does not save nor transmit your password other than the initial authentication API call `Task<TastySessionInfo> getAuthorization()`.  
 
 All communication between TastyTrade and the TastyBot is encrypted using SSL.
 
