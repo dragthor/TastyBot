@@ -22,7 +22,7 @@ namespace TastyBot.Tests
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
+                throw;
             }
             finally
             {

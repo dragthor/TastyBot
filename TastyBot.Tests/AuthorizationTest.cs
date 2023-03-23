@@ -23,8 +23,8 @@ namespace TastyBot.Tests
                 Assert.IsFalse(string.IsNullOrWhiteSpace(authToken));
                 Assert.AreEqual(User, user);
 
-            } catch (Exception ex) { 
-                Console.WriteLine(ex);
+            } catch (Exception ex) {
+                throw;
             }
             finally
             {
