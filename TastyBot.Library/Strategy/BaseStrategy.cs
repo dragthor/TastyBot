@@ -79,5 +79,20 @@ namespace TastyBot.Strategy
 
             return existingPositions > 0;
         }
+
+        protected TastySpread CreatCreditSpread(Leg shortLeg, Leg longLeg, decimal desiredCredit)
+        {
+            var creditSpread = new TastySpread()
+            {
+                source = StrategyOrderSource.Name,
+                ordertype = StrategyOrderType.Limit,
+                timeinforce = StrategyOrderInForce.Day,
+                price = desiredCredit.ToString(),
+                priceeffect = StrategyOrderResultType.Credit,
+                legs = new Leg[] { shortLeg, longLeg }
+            };
+
+            return creditSpread;
+        }
     }
 }

@@ -3,12 +3,12 @@ using TastyBot.Models;
 
 namespace TastyBot.Strategy
 {
-    public class PutSpread : BaseStrategy, ITastyBotStrategy
+    public class CallSpread : BaseStrategy, ITastyBotStrategy
     {
         private readonly int _spreadWidth;
         private readonly int _daysToExpiration;
 
-        public PutSpread(ITastyBot bot, IQuoteMachine quoteMachine, TastyAccount account, string ticker, int spreadWidth, int daysToExpiration) : base(bot, quoteMachine, account, ticker)
+        public CallSpread(ITastyBot bot, IQuoteMachine quoteMachine, TastyAccount account, string ticker, int spreadWidth, int daysToExpiration) : base(bot, quoteMachine, account, ticker)
         {
             _spreadWidth = spreadWidth;
             _daysToExpiration = daysToExpiration;
@@ -16,15 +16,15 @@ namespace TastyBot.Strategy
 
         public static ITastyBotStrategy CreateInstance(ITastyBot bot, IQuoteMachine quoteMachine, TastyAccount account, string ticker, int spreadWidth, int daysToExpiration)
         {
-            return new PutSpread(bot, quoteMachine, account, ticker, spreadWidth, daysToExpiration);
+            return new CallSpread(bot, quoteMachine, account, ticker, spreadWidth, daysToExpiration);
         }
 
         public async Task<StrategyAttemptResult> MakeAttempt()
         {
             const int dteRange = 5;  // plus/minus days around desired DTE.
             const int qty = 1;
-            const decimal otm = .90m; // 10% OTM.
-            const decimal priceDrop = -2m; // Price decreased 2%.
+            const decimal otm = .10m; // 10% OTM.
+            const decimal priceIncrease = 2m; // Price increased 2%.
             const decimal desiredCredit = 1.95m; // Something ridiculous so that we do NOT get filled.
 
             // Keep at least $1,000K in cash.  If this trade reduces our buying power below $1K, then do not submit the order.
@@ -51,9 +51,11 @@ namespace TastyBot.Strategy
 
             var quote = await _quoteMachine.getQuote(_ticker);
 
-            var desiredStrike = Convert.ToDecimal(Math.Floor(Convert.ToDecimal(quote.price) * otm));
+            var increaseChange = Convert.ToDouble(Math.Ceiling(Convert.ToDecimal(quote.price) * otm));
 
-            if (Convert.ToDecimal(quote.dayChange) >= priceDrop)
+            var desiredStrike = Convert.ToDecimal(Math.Ceiling(quote.price + increaseChange));
+
+            if (Convert.ToDecimal(quote.dayChange) <= priceIncrease)
             {
                 return StrategyAttemptResult.NothingToDo;
             }
@@ -75,7 +77,7 @@ namespace TastyBot.Strategy
                     var strikes = expiration.strikes.ToList();
 
                     sellStrike = strikes.Where(x => Convert.ToDecimal(x.strikeprice) == desiredStrike).FirstOrDefault();
-                    buyStrike = strikes.Where(x => Convert.ToDecimal(x.strikeprice) == desiredStrike - _spreadWidth).FirstOrDefault();
+                    buyStrike = strikes.Where(x => Convert.ToDecimal(x.strikeprice) == desiredStrike + _spreadWidth).FirstOrDefault();
 
                     if (sellStrike != null && buyStrike != null)
                     {
@@ -94,7 +96,7 @@ namespace TastyBot.Strategy
             var shortLeg = new Leg()
             {
                 instrumenttype = StrategyInstrumentType.EquityOption,
-                symbol = sellStrike.put,
+                symbol = sellStrike.call,
                 action = StrategyLegAction.SellToOpen,
                 quantity = qty.ToString()
             };
@@ -102,7 +104,7 @@ namespace TastyBot.Strategy
             var longLeg = new Leg()
             {
                 instrumenttype = StrategyInstrumentType.EquityOption,
-                symbol = buyStrike.put,
+                symbol = buyStrike.call,
                 action = StrategyLegAction.BuyToOpen,
                 quantity = qty.ToString()
             };
@@ -124,12 +126,14 @@ namespace TastyBot.Strategy
                     if (order.order.status.ToLower() == "routed" || order.order.status.ToLower() == "received")
                     {
                         return StrategyAttemptResult.OrderEntered;
-                    } else
+                    }
+                    else
                     {
                         return StrategyAttemptResult.OrderRoutingError;
                     }
                 }
-            } else
+            }
+            else
             {
                 if (preview.warnings.Length > 0)
                 {
@@ -138,7 +142,7 @@ namespace TastyBot.Strategy
 
                 return StrategyAttemptResult.OrderNotReceived;
             }
-            
+
             return StrategyAttemptResult.NothingToDo;
         }
     }
