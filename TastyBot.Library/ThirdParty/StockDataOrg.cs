@@ -1,10 +1,10 @@
 ﻿using Newtonsoft.Json;
 using System.Net;
-using TastyBot.Models;
 using TastyBot.Rules;
 
 namespace TastyBot.Library.ThirdParty
 {
+    // https://www.stockdata.org
     public class StockDataOrg : IQuoteMachine
     {
         private readonly string _baseQuoteUrl;

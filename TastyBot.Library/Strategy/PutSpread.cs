@@ -1,5 +1,4 @@
 ﻿using TastyBot.Library;
-using TastyBot.Library.ThirdParty;
 using TastyBot.Models;
 
 namespace TastyBot.Strategy
@@ -20,35 +19,43 @@ namespace TastyBot.Strategy
             return new PutSpread(bot, quoteMachine, account, ticker, spreadWidth, daysToExpiration);
         }
 
-        public async Task<int> MakeAttempt()
+        public async Task<StrategyAttemptResult> MakeAttempt()
         {
             const int dteRange = 5;  // plus/minus days around desired DTE.
+            const int qty = 1;
+            const decimal otm = .90m; // 10% OTM.
+            const decimal priceDrop = -2m; // Price drops 2%.
+            const decimal desiredCredit = 1.95m; // Something ridiculous so that we do NOT get filled.
+
+            // Keep at least $1,000K in cash.  If this trade reduces our buying power below $1K, then do not submit the order.
+            const decimal maintainAtLeastThisMuchBuyingPower = 1000m;
 
             var minDte = _daysToExpiration - dteRange;
             var maxDte = _daysToExpiration + dteRange;
 
+            if (string.IsNullOrWhiteSpace(_ticker)) return StrategyAttemptResult.InvalidSetup;
+            if (_spreadWidth < 1) return StrategyAttemptResult.InvalidSetup; // Yeah, I know some tickers have more narrow strikes.
+            if (_daysToExpiration < 0) return StrategyAttemptResult.InvalidSetup;
+
+            if (minDte < 0) minDte = _daysToExpiration;
+
             var anyOpenOrders = await OpenOrders();
 
             // Bail if we already have an open order.
-            if (anyOpenOrders) return 0;
+            if (anyOpenOrders) return StrategyAttemptResult.NothingToDo;
 
             var anyExistingPositions = await ExistingPositions();
 
             // Bail if we already have a position.
-            if (anyExistingPositions) return 0;
+            if (anyExistingPositions) return StrategyAttemptResult.NothingToDo;
 
             var quote = await _quoteMachine.getQuote(_ticker);
 
-            // 10% OTM.
-            var desiredStrike = Convert.ToDecimal(Math.Floor(quote.price * .90));
+            var desiredStrike = Convert.ToDecimal(Math.Floor(Convert.ToDecimal(quote.price) * otm));
 
-            // Keep at least $2,500K in cash.
-            var maintainAtLeastThisMuchBuyingPower = 2500;
-
-            // Bail if we do not have a 2% drop.
-            if (quote.dayChange > -2d)
+            if (Convert.ToDecimal(quote.dayChange) >= priceDrop)
             {
-                return 0;
+                return StrategyAttemptResult.NothingToDo;
             }
 
             var optionChain = await _bot.getOptionChain(_ticker);
@@ -81,57 +88,65 @@ namespace TastyBot.Strategy
             // Double check.
             if (sellStrike == null || buyStrike == null)
             {
-                return 0;
+                return StrategyAttemptResult.StrikeNotFound;
             }
 
             var shortLeg = new Leg()
             {
-                instrumenttype = "Equity Option",
+                instrumenttype = StrategyInstrumentType.EquityOption,
                 symbol = sellStrike.put,
-                action = "Sell to Open",
-                quantity = "1"
+                action = StrategyLegAction.SellToOpen,
+                quantity = qty.ToString()
             };
 
             var longLeg = new Leg()
             {
-                instrumenttype = "Equity Option",
+                instrumenttype = StrategyInstrumentType.EquityOption,
                 symbol = buyStrike.put,
-                action = "Buy to Open",
-                quantity = "1"
+                action = StrategyLegAction.BuyToOpen,
+                quantity = qty.ToString()
             };
 
             var creditSpread = new TastySpread()
             {
-                source = "WBT-ember;",
-                ordertype = "Limit",
-                timeinforce = "Day",
-                price = "1.95", // Something ridiculous so that we do NOT get filled.
-                priceeffect = "Credit",
+                source = StrategyOrderSource.Name,
+                ordertype = StrategyOrderType.Limit,
+                timeinforce = StrategyOrderInForce.Day,
+                price = desiredCredit.ToString(),
+                priceeffect = StrategyOrderResultType.Credit,
                 legs = new Leg[] { shortLeg, longLeg }
             };
 
             var preview = await _bot.doDryRun(_account.account.accountnumber, creditSpread);
 
-            if (preview.warnings.Length == 0)
+            if (preview.order.status.ToLower() == "received")
             {
-                if (preview.order.status.ToLower() == "received")
+                var newBuyingPower = Convert.ToDecimal(preview.buyingpowereffect.newbuyingpower);
+
+                if (newBuyingPower > maintainAtLeastThisMuchBuyingPower)
                 {
-                    var newBuyingPower = Convert.ToDecimal(preview.buyingpowereffect.newbuyingpower);
+                    // Warning: Actually places an order when _liveOrdersEnabled is true (default is false).
+                    var order = await _bot.placeOrder(_account.account.accountnumber, creditSpread);
 
-                    if (newBuyingPower > maintainAtLeastThisMuchBuyingPower)
+                    if (order.order.status.ToLower() == "routed")
                     {
-                        // Warning: Actually places an order when _liveOrdersEnabled is true (default is false).
-                        var order = await _bot.placeOrder(_account.account.accountnumber, creditSpread);
-
-                        if (order.order.status.ToLower() == "routed")
-                        {
-                            return 1;
-                        }
+                        return StrategyAttemptResult.OrderEntered;
+                    } else
+                    {
+                        return StrategyAttemptResult.OrderRoutingError;
                     }
                 }
-            }
+            } else
+            {
+                if (preview.warnings.Length > 0)
+                {
+                    return StrategyAttemptResult.OrderWarnings;
+                }
 
-            return 0;
+                return StrategyAttemptResult.OrderNotReceived;
+            }
+            
+            return StrategyAttemptResult.NothingToDo;
         }
     }
 }

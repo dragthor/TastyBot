@@ -12,7 +12,7 @@ namespace TastyBot.Library
         private readonly string _secretSauce;
         private readonly string _baseUrl;
         private readonly int _timeOut;
-        private readonly bool _liveOrdersEnabled = false;
+        private readonly bool _liveOrdersEnabled = false;  // Orders will NOT be placed unless true.
 
         private readonly HttpClient _client;
 
@@ -149,7 +149,7 @@ namespace TastyBot.Library
         public async Task<TastyOrderData> placeOrder(string accountId, TastySpread spread)
         {
             // Fail safe.
-            if (_liveOrdersEnabled == false) throw new Exception("Live orders are NOT enabled.");
+            if (_liveOrdersEnabled == false) throw new Exception("Live orders are NOT enabled.  Use CreateInstance instead of CreateDebugInstance.");
 
             var json = JsonConvert.SerializeObject(spread);
             var content = new StringContent(json, Encoding.UTF8, "application/json");

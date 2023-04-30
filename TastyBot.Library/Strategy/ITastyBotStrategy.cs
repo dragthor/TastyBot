@@ -2,6 +2,6 @@
 {
     public interface ITastyBotStrategy
     {
-        Task<int> MakeAttempt();
+        Task<StrategyAttemptResult> MakeAttempt();
     }
 }

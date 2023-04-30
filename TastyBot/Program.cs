@@ -36,10 +36,30 @@ namespace TastyBot
          
                 var result = await p.MakeAttempt();
 
-                if (result == 1)
-                {
-                    Console.WriteLine($"Order entered.");
-                }    
+                switch (result) {
+                    case StrategyAttemptResult.OrderEntered:
+                        Console.WriteLine("Order entered.");
+                        break;
+                    case StrategyAttemptResult.StrikeNotFound:
+                        Console.WriteLine("Unable to find desired strike(s).");
+                        break;
+                    case StrategyAttemptResult.InvalidSetup:
+                        Console.WriteLine("Invalid strategy or order setup.");
+                        break;
+                    case StrategyAttemptResult.OrderRoutingError:
+                        Console.WriteLine("Order routing issue.");
+                        break;
+                    case StrategyAttemptResult.OrderWarnings:
+                        Console.WriteLine("Order has warnings.");
+                        break;
+                    case StrategyAttemptResult.OrderNotReceived:
+                        Console.WriteLine("Order was not received.");
+                        break;
+                    case StrategyAttemptResult.NothingToDo:
+                    default:
+                        Console.WriteLine("Nothing to do at this time.");
+                        break;
+                }  
             }
             catch (Exception ex)
             {
