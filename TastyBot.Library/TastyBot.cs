@@ -8,6 +8,7 @@ namespace TastyBot.Library
 {
     public class TastyBot : ITastyBot
     {
+        private readonly ILogger _logger;
         private readonly string _secretName;
         private readonly string _secretSauce;
         private readonly string _baseUrl;
@@ -18,7 +19,8 @@ namespace TastyBot.Library
 
         private string _authToken;  
 
-        private TastyBot(string secretName, string secretSauce, string baseUrl, int timeOut, bool liveOrdersEnabled) {
+        private TastyBot(ILogger logger, string secretName, string secretSauce, string baseUrl, int timeOut, bool liveOrdersEnabled) {
+            _logger = logger;
             _secretName = secretName;
             _secretSauce= secretSauce;
             _baseUrl = baseUrl;
@@ -34,16 +36,16 @@ namespace TastyBot.Library
             _liveOrdersEnabled = liveOrdersEnabled;
         }
 
-        public static ITastyBot CreateDebugInstance(string secretName, string secretSauce, string baseUrl, int timeOut)
+        public static ITastyBot CreateDebugInstance(ILogger logger, string secretName, string secretSauce, string baseUrl, int timeOut)
         {
-            var bot = new TastyBot(secretName, secretSauce, baseUrl, timeOut, false);
+            var bot = new TastyBot(logger, secretName, secretSauce, baseUrl, timeOut, false);
 
             return bot;
         }
 
-        public static ITastyBot CreateInstance(string secretName, string secretSauce, string baseUrl, int timeOut)
+        public static ITastyBot CreateInstance(ILogger logger, string secretName, string secretSauce, string baseUrl, int timeOut)
         {
-            var bot = new TastyBot(secretName, secretSauce, baseUrl, timeOut, true);
+            var bot = new TastyBot(logger, secretName, secretSauce, baseUrl, timeOut, true);
 
             return bot;
         }

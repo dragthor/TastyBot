@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 using System;
 using System.Threading.Tasks;
 
@@ -10,7 +11,8 @@ namespace TastyBot.Tests
         [TestMethod]
         public async Task able_to_get_quote_streamer_info()
         {
-            var tastyBot = Library.TastyBot.CreateDebugInstance(User, Password, BaseUrl, 10);
+            var logger = new Mock<Library.ILogger>();
+            var tastyBot = Library.TastyBot.CreateDebugInstance(logger.Object, User, Password, BaseUrl, 10);
 
             try
             {

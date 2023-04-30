@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using System.Linq;
 using TastyBot.Strategy;
+using TastyBot.Library;
 
 namespace TastyBot
 {
@@ -14,20 +15,22 @@ namespace TastyBot
         
         public static async Task Main(string[] args)
         {
-            var tastyBot = Library.TastyBot.CreateDebugInstance(SecretName, SecretSauce, BaseUrl, TimeOut);
-            var quoteMachine = Library.ThirdParty.StockDataOrg.CreateInstance(BaseQuoteUrl, TimeOut, StockDataOrgApiToken);
+            ILogger logger = new ConsoleLogger();
 
+            var tastyBot = Library.TastyBot.CreateDebugInstance(logger, SecretName, SecretSauce, BaseUrl, TimeOut);
+            var quoteMachine = Library.ThirdParty.StockDataOrg.CreateInstance(logger, BaseQuoteUrl, TimeOut, StockDataOrgApiToken);
+            
             try
             {
                 var sessionInfo = await tastyBot.getAuthorization();
 
-                Console.WriteLine($"Welcome: {sessionInfo.user.username}");
+                logger.Info($"Welcome: {sessionInfo.user.username}");
 
                 var accounts = await tastyBot.getAccounts();
 
                 accounts.items.ToList().ForEach(account =>
                 {
-                    Console.WriteLine($"Account: {account.account.accountnumber}");
+                    logger.Info($"Account: {account.account.accountnumber}");
                 });
 
                 var primaryAccount = accounts.items.First();
@@ -38,37 +41,54 @@ namespace TastyBot
 
                 switch (result) {
                     case StrategyAttemptResult.OrderEntered:
-                        Console.WriteLine("Order entered.");
+                        logger.Info("Order entered.");
                         break;
                     case StrategyAttemptResult.StrikeNotFound:
-                        Console.WriteLine("Unable to find desired strike(s).");
+                        logger.Info("Unable to find desired strike(s).");
                         break;
                     case StrategyAttemptResult.InvalidSetup:
-                        Console.WriteLine("Invalid strategy or order setup.");
+                        logger.Info("Invalid strategy or order setup.");
                         break;
                     case StrategyAttemptResult.OrderRoutingError:
-                        Console.WriteLine("Order routing issue.");
+                        logger.Info("Order routing issue.");
                         break;
                     case StrategyAttemptResult.OrderWarnings:
-                        Console.WriteLine("Order has warnings.");
+                        logger.Info("Order has warnings.");
                         break;
                     case StrategyAttemptResult.OrderNotReceived:
-                        Console.WriteLine("Order was not received.");
+                        logger.Info("Order was not received.");
                         break;
                     case StrategyAttemptResult.NothingToDo:
                     default:
-                        Console.WriteLine("Nothing to do at this time.");
+                        logger.Info("Nothing to do at this time.");
                         break;
                 }  
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                logger.Error(ex.Message);
             }
             finally
             {
                 await tastyBot.Terminate();
                 await quoteMachine.Terminate();
+            }
+        }
+
+        public class ConsoleLogger : ILogger
+        {
+            public void Info(string message)
+            {
+                if (string.IsNullOrWhiteSpace(message)) return;
+
+                Console.WriteLine(message);
+            }
+
+            public void Error(string message)
+            {
+                if (string.IsNullOrWhiteSpace(message)) return;
+
+                Console.WriteLine(message);
             }
         }
     }

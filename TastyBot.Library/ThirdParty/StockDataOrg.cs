@@ -7,14 +7,16 @@ namespace TastyBot.Library.ThirdParty
     // https://www.stockdata.org
     public class StockDataOrg : IQuoteMachine
     {
+        private readonly ILogger _logger;
         private readonly string _baseQuoteUrl;
         private readonly int _timeOut;
         private readonly string _apiToken;
 
         private readonly HttpClient _client;
 
-        private StockDataOrg(string baseQuoteUrl, int timeOut, string apiToken)
+        private StockDataOrg(ILogger logger, string baseQuoteUrl, int timeOut, string apiToken)
         {
+            _logger = logger;
             _baseQuoteUrl = baseQuoteUrl;
             _timeOut = timeOut;
             _apiToken = apiToken;
@@ -28,9 +30,9 @@ namespace TastyBot.Library.ThirdParty
             _client.Timeout = TimeSpan.FromSeconds(_timeOut);
         }
 
-        public static IQuoteMachine CreateInstance(string baseQuoteUrl, int timeOut, string apiToken)
+        public static IQuoteMachine CreateInstance(ILogger logger, string baseQuoteUrl, int timeOut, string apiToken)
         {
-            return new StockDataOrg(baseQuoteUrl, timeOut, apiToken);
+            return new StockDataOrg(logger, baseQuoteUrl, timeOut, apiToken);
         }
 
         public async Task<IRuleQuote> getQuote(string ticker)
