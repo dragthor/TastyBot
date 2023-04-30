@@ -1,16 +1,11 @@
 ﻿using Newtonsoft.Json;
 using System.Net;
 using TastyBot.Models;
+using TastyBot.Rules;
 
-namespace TastyBot.Library
+namespace TastyBot.Library.ThirdParty
 {
-    public interface IStockDataOrg
-    {
-        Task<StockDataQuote> getQuote(string ticker);
-        void Terminate();
-    }
-
-    public class StockDataOrg : IStockDataOrg
+    public class StockDataOrg : IQuoteMachine
     {
         private readonly string _baseQuoteUrl;
         private readonly int _timeOut;
@@ -33,12 +28,12 @@ namespace TastyBot.Library
             _client.Timeout = TimeSpan.FromSeconds(_timeOut);
         }
 
-        public static IStockDataOrg CreateInstance(string baseQuoteUrl, int timeOut, string apiToken)
+        public static IQuoteMachine CreateInstance(string baseQuoteUrl, int timeOut, string apiToken)
         {
             return new StockDataOrg(baseQuoteUrl, timeOut, apiToken);
         }
 
-        public async Task<StockDataQuote> getQuote(string ticker)
+        public async Task<IRuleQuote> getQuote(string ticker)
         {
             var request = new HttpRequestMessage
             {
@@ -55,12 +50,14 @@ namespace TastyBot.Library
             return obj.data.First();
         }
 
-        public void Terminate()
+        public Task Terminate()
         {
             if (_client != null)
             {
                 _client.Dispose();
             }
+
+            return Task.CompletedTask;
         }
     }
 }

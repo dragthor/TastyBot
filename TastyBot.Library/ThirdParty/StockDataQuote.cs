@@ -1,7 +1,6 @@
-﻿using System;
-using TastyBot.Rules;
+﻿using TastyBot.Rules;
 
-namespace TastyBot.Models
+namespace TastyBot.Library.ThirdParty
 {
     public class StockDataQuoteInfo
     {
