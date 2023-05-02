@@ -1,7 +1,7 @@
-﻿using TastyBot.Library;
-using TastyBot.Models;
+﻿using TastyBot.Models;
+using TastyBot.Strategy;
 
-namespace TastyBot.Strategy
+namespace TastyBot.Library.Strategy.Equity
 {
     public class PutSpread : BaseStrategy, ITastyBotStrategy
     {
@@ -124,12 +124,14 @@ namespace TastyBot.Strategy
                     if (order.order.status.ToLower() == "routed" || order.order.status.ToLower() == "received")
                     {
                         return StrategyAttemptResult.OrderEntered;
-                    } else
+                    }
+                    else
                     {
                         return StrategyAttemptResult.OrderRoutingError;
                     }
                 }
-            } else
+            }
+            else
             {
                 if (preview.warnings.Length > 0)
                 {
@@ -138,7 +140,7 @@ namespace TastyBot.Strategy
 
                 return StrategyAttemptResult.OrderNotReceived;
             }
-            
+
             return StrategyAttemptResult.NothingToDo;
         }
     }

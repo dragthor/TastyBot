@@ -1,7 +1,7 @@
-﻿using TastyBot.Library;
-using TastyBot.Models;
+﻿using TastyBot.Models;
+using TastyBot.Strategy;
 
-namespace TastyBot.Strategy
+namespace TastyBot.Library.Strategy.Equity
 {
     public class CallSpread : BaseStrategy, ITastyBotStrategy
     {

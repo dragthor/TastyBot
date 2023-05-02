@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using System.Linq;
 using TastyBot.Strategy;
 using TastyBot.Library;
+using TastyBot.Library.Strategy;
 
 namespace TastyBot
 {
@@ -35,14 +36,14 @@ namespace TastyBot
 
                 var primaryAccount = accounts.items.First();
 
-                // This is not an iron condor.  Based on the current strategy, only one will be filled.
-                ITastyBotStrategy p = PutSpread.CreateInstance(tastyBot, quoteMachine, primaryAccount, "SPY", 5, 50);
+                // This is not an iron condor.  Based on the current strategy, only one side will be submitted due to existing position check.
+                ITastyBotStrategy p = Library.Strategy.Equity.PutSpread.CreateInstance(tastyBot, quoteMachine, primaryAccount, "SPY", 5, 50);
 
                 var putSpreadResult = await p.MakeAttempt();
 
                 ConsoleLogger.ProcessResult(logger, putSpreadResult);
 
-                ITastyBotStrategy c = CallSpread.CreateInstance(tastyBot, quoteMachine, primaryAccount, "SPY", 5, 50);
+                ITastyBotStrategy c = Library.Strategy.Equity.CallSpread.CreateInstance(tastyBot, quoteMachine, primaryAccount, "SPY", 5, 50);
 
                 var callSpreadResult = await c.MakeAttempt();
 
